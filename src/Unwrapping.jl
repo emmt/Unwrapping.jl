@@ -62,8 +62,8 @@ function unwrap(psi::AbstractMatrix{T},
     n1, n2 = size(psi)
 
     # We need 2 workspace arrays.
-    wrk1 = fill!(Array{T}(undef, n1, n2),0)
-    wrk2 = fill!(Array{T}(undef, n1, n2),0)
+    wrk1 = Array{T}(undef, n1, n2)
+    wrk2 = Array{T}(undef, n1, n2)
 
     # Compute wrapped phase Laplacian by finite differences.  We first compute
     # wrapped phase gradient along a given dimension by finite differences and
@@ -112,7 +112,7 @@ function unwrap(psi::AbstractMatrix{T},
     q1 = Array{T}(undef, n1) # array of cosine along first dimension
     a1 = T(π)/n1
     @inbounds @simd for j1 in 1:n1
-        q1[j1] = dct_q(a1*(j1 - 1))
+        q1[j1] = two_cos_minus_two(a1*(j1 - 1))
     end
     if n1 == n2
         @inbounds for j2 in 1:n2
@@ -124,7 +124,7 @@ function unwrap(psi::AbstractMatrix{T},
     else
         a2 = T(π)/n2
         @inbounds for j2 in 1:n2
-            q2 = dct_q(a2*(j2 - 1))
+            q2 = two_cos_minus_two(a2*(j2 - 1))
             @simd for j1 in 1:n1
                 q[j1,j2] = q1[j1] + q2
             end
@@ -159,11 +159,11 @@ function unwrap(psi::AbstractMatrix{T},
 end
 
 """
-    dct_q(x) -> 2*(cos(x) - 1)
+    two_cos_minus_two(x) -> 2*cos(x) - 2
 
-computes accurately `2*(cos(x) - 1)` given the floating-point value `x`
+computes accurately `2*cos(x) - 2` given the floating-point value `x`.
 
 """
-dct_q(x::AbstractFloat) = -4*sin(x/2)^2
+two_cos_minus_two(x::AbstractFloat) = -4*sin(x/2)^2
 
 end # module
