@@ -10,3 +10,7 @@ method:
 
 - Improved precision (by about 3 digits) by accurately compute `cos(x) - 1`.
   As a result, the algorithm can be used directly in single precision.
+
+- The original algorithm yields the least square solution up to an undetermined
+  additive constant.  This bias is avoided (modulo the period) by the
+  implemented method.

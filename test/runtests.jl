@@ -30,8 +30,13 @@ dims = (384, 288)
     tol = eps(T)*8
     A = make_screen(T, dims)
     Aw = arc.(A)
-    A1 = unwrap(Aw)
+    A1 = unwrap(Aw; debiased=false)
+    A2 = unwrap(Aw; debiased=true)
+    # std() method is insensitive to a bias
     @test std(A - A1) ≤ tol*std(A - Aw)
+    @test std(A - A2) ≤ tol*std(A - Aw)
+    # A2 is debiased (modulo 2π)
+    @test abs(arc(mean(A - A2))) ≤ sqrt(tol)
 end
 
 end # module

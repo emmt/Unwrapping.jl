@@ -32,7 +32,7 @@ wrap(x::T, p::T) where {T<:Real} = wrap(Float64(x), Float64(p))
 wrap(x::T, p::T) where {T<:AbstractFloat} = x - p*round(x/p)
 
 """
-    unwrap(psi, p=2π) -> phi
+    unwrap(psi, p=2π; debiased=true) -> phi
 
 yields the unwrapped phase `phi` that best fits, in a least squares sense, the
 wrapped phase `psi`.  Optional argument `p` is the period of the wrapping.
@@ -43,6 +43,12 @@ unweighted phase unwrapping that uses fast transforms and iterative methods"*
 by Dennis C. Ghiglia and Louis A. Romero (J. Opt. Soc. Am. A, Vol. 11,
 pp. 107-117, 1994).
 
+Keyword `debiased` (true by default) specifies whether a constant bias (modulo
+the period) should be avoided.  Original algorithm yields a biased solution up
+to an undetermined additive constant.  Estimating this bias has a cost, so use
+`debiased = false` if such an error is irrelevant for your needs.  In that
+case, a zero-mean solution is returned (up to rounding errors).
+
 """
 function unwrap(psi::AbstractMatrix{T},
                 period::Real; kwds...) where {T<:AbstractFloat}
@@ -50,7 +56,8 @@ function unwrap(psi::AbstractMatrix{T},
 end
 
 function unwrap(psi::AbstractMatrix{T},
-                period::T = twopi(T)) where {T<:AbstractFloat}
+                period::T = twopi(T);
+                debiased::Bool = true) where {T<:AbstractFloat}
     Base.has_offset_axes(psi) && error("input array has non-standard axes")
     n1, n2 = size(psi)
 
@@ -133,6 +140,21 @@ function unwrap(psi::AbstractMatrix{T},
         phi[j] = rho[j]/q[j]
     end
     idct!(phi)
+    if debiased
+        # Fix a piston error (modulo the period) in the computed solution.
+        a = twopi(T)/period
+        sum_cos = zero(T)
+        sum_sin = zero(T)
+        @inbounds @simd for j in eachindex(psi, phi)
+            sin_j, cos_j = sincos(a*(psi[j] - phi[j]))
+            sum_sin += sin_j
+            sum_cos += cos_j
+        end
+        bias = atan(sum_sin, sum_cos)/a
+        @inbounds @simd for j in eachindex(phi)
+            phi[j] += bias
+        end
+    end
     return phi
 end
 
