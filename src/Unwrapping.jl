@@ -105,7 +105,7 @@ function unwrap(psi::AbstractMatrix{T},
     q1 = Array{T}(undef, n1) # array of cosine along first dimension
     a1 = T(π)/n1
     @inbounds @simd for j1 in 1:n1
-        q1[j1] = 2*(cos(a1*(j1 - 1)) - 1)
+        q1[j1] = dct_q(a1*(j1 - 1))
     end
     if n1 == n2
         @inbounds for j2 in 1:n2
@@ -117,7 +117,7 @@ function unwrap(psi::AbstractMatrix{T},
     else
         a2 = T(π)/n2
         @inbounds for j2 in 1:n2
-            q2 = 2*(cos(a2*(j2 - 1)) - 1)
+            q2 = dct_q(a2*(j2 - 1))
             @simd for j1 in 1:n1
                 q[j1,j2] = q1[j1] + q2
             end
@@ -134,5 +134,13 @@ function unwrap(psi::AbstractMatrix{T},
     idct!(phi)
     return phi
 end
+
+"""
+    dct_q(x) -> 2*(cos(x) - 1)
+
+yeilds `2*(cos(x) - 1)` given the floating-point value `x`
+
+"""
+dct_q(x::AbstractFloat) = 2*cos(x) - 2
 
 end # module
