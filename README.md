@@ -8,7 +8,8 @@ This package implements the phase unwrapping algorithm of Dennis C. Ghiglia and
 Louis A. Romero ([*"Robust two-dimensional weighted and unweighted phase
 unwrapping that uses fast transforms and iterative
 methods"*](https://doi.org/10.1364/JOSAA.11.000107), J. Opt. Soc. Am. A,
-Vol. 11, pp. 107-117, 1994).
+Vol. 11, pp. 107-117, 1994).  This algorithm works better when there are not
+too many strong discontinuities (sharp edges).
 
 This package provides the following improvements with respect to the original
 method:
