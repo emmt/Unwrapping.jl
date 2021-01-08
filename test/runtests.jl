@@ -1,6 +1,7 @@
 module UnwrappingTests
 
 using Unwrapping, Test, Statistics
+using Unwrapping: unwrap, wrap, arc
 
 function make_screen(T::Type{<:AbstractFloat}, dims::Dims{2})
     A = Array{T}(undef, dims)
@@ -23,13 +24,14 @@ function make_screen(T::Type{<:AbstractFloat}, dims::Dims{2})
     return A
 end
 
-T = Float64
 dims = (384, 288)
-tol = 1e-12
 
-A = make_screen(T, dims)
-Aw = Unwrapping.arc.(A)
-A1 = Unwrapping.unwrap(Aw)
-@test std(A - A1) ≤ tol*std(A - Aw)
+@testset "Original Ghiglia & Romero method (T = $T)" for T in (Float32, Float64)
+    tol = eps(T)*8
+    A = make_screen(T, dims)
+    Aw = arc.(A)
+    A1 = unwrap(Aw)
+    @test std(A - A1) ≤ tol*std(A - Aw)
+end
 
 end # module

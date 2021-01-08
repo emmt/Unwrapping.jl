@@ -127,6 +127,7 @@ function unwrap(psi::AbstractMatrix{T},
 
     # Compute the solution (Julia's dct is of type II).
     dct!(rho)
+    rho[1,1] = 0 # should be exactly zero without rounding errors
     phi = wrk1 # we re-use one of the workspaces to spare allocations
     @inbounds @simd for j in eachindex(wrk1, wrk2)
         phi[j] = rho[j]/q[j]
@@ -138,9 +139,9 @@ end
 """
     dct_q(x) -> 2*(cos(x) - 1)
 
-yeilds `2*(cos(x) - 1)` given the floating-point value `x`
+computes accurately `2*(cos(x) - 1)` given the floating-point value `x`
 
 """
-dct_q(x::AbstractFloat) = 2*cos(x) - 2
+dct_q(x::AbstractFloat) = -4*sin(x/2)^2
 
 end # module
