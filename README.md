@@ -5,9 +5,10 @@
 | [![][license-img]][license-url] | [![][travis-img]][travis-url] [![][appveyor-img]][appveyor-url] | [![][coveralls-img]][coveralls-url] [![][codecov-img]][codecov-url] |
 
 This package implements the phase unwrapping algorithm of Dennis C. Ghiglia and
-Louis A. Romero (*"Robust two-dimensional weighted and unweighted phase
-unwrapping that uses fast transforms and iterative methods"*,
-J. Opt. Soc. Am. A, Vol. 11, pp. 107-117, 1994).
+Louis A. Romero ([*"Robust two-dimensional weighted and unweighted phase
+unwrapping that uses fast transforms and iterative
+methods"*](https://doi.org/10.1364/JOSAA.11.000107), J. Opt. Soc. Am. A,
+Vol. 11, pp. 107-117, 1994).
 
 This package provides the following improvements with respect to the original
 method:
