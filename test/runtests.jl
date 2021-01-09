@@ -65,7 +65,7 @@ peaks = read_test_data(joinpath(TESTDIR, "peaks-434x342.dat.gz"))
 #dims = (384, 288)
 
 @testset "DCT and FFT-based methods (T = $T)" for T in (Float32, Float64)
-    dct_tol = eps(T)*8
+    dct_tol = 200*eps(T)
     fft_tol = 0.005
     #A = make_screen(T, dims)
     for A in (T(0.2)*gauss, T(0.2)*peaks)
