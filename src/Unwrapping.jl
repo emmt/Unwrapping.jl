@@ -32,7 +32,7 @@ wrap(x::T, p::T) where {T<:Real} = wrap(Float64(x), Float64(p))
 wrap(x::T, p::T) where {T<:AbstractFloat} = x - p*round(x/p)
 
 """
-    unwrap(psi, p=2π; debiased=true) -> phi
+    unwrap(psi, p=2π; debiased=false) -> phi
 
 yields the unwrapped phase `phi` that best fits, in a least squares sense, the
 wrapped phase `psi`.  Optional argument `p` is the period of the wrapping.
@@ -44,10 +44,10 @@ by Dennis C. Ghiglia and Louis A. Romero (J. Opt. Soc. Am. A, Vol. 11,
 pp. 107-117, 1994).
 
 Keyword `debiased` (true by default) specifies whether a constant bias (modulo
-the period) should be avoided.  Original algorithm yields a biased solution up
-to an undetermined additive constant.  Estimating this bias has a cost, so use
-`debiased = false` if such an error is irrelevant for your needs.  In that
-case, a zero-mean solution is returned (up to rounding errors).
+the period) should be avoided.  if `debiased` is false (the default), a
+zero-mean solution is returned (up to rounding errors) as in the original
+algorithm.  Estimating the bias has a cost, so do not set `debiased = true` if
+this bias is irrelevant for your needs.
 
 """
 function unwrap(psi::AbstractMatrix{T},
@@ -57,7 +57,7 @@ end
 
 function unwrap(psi::AbstractMatrix{T},
                 period::T = twopi(T);
-                debiased::Bool = true) where {T<:AbstractFloat}
+                debiased::Bool = false) where {T<:AbstractFloat}
     Base.has_offset_axes(psi) && error("input array has non-standard axes")
     n1, n2 = size(psi)
 
@@ -148,7 +148,7 @@ function unwrap(psi::AbstractMatrix{T},
 end
 
 """
-    fft_unwrap(psi, p=2π; debiased=true) -> phi
+    fft_unwrap(psi, p=2π; debiased=false) -> phi
 
 yields the same result as `unwrap` but using a Fast Fourier Transform (FFT)
 instead of a Cosine Fourier Transform (DCT).  This version is slower then the
@@ -158,7 +158,7 @@ of the DCT.
 """
 function fft_unwrap(psi::AbstractMatrix{T},
                     period::T = twopi(T);
-                    debiased::Bool = true) where {T<:AbstractFloat}
+                    debiased::Bool = false) where {T<:AbstractFloat}
     Base.has_offset_axes(psi) && error("input array has non-standard axes")
     n1, n2 = size(psi)
 
